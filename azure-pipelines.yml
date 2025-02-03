@@ -1,0 +1,37 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+  branches:
+    include:
+      - 'main'
+  paths:
+    exclude:
+      - azure-pipelines.yml
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build And Publish Image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: Docker@2
+      displayName: Build And Publish Image
+      inputs:
+        containerRegistry: 'Move Hackathon Docker Container Registry Connection'
+        repository: 'MoveHackathon'
+        command: 'buildAndPush'
+        Dockerfile: './Dockerfile'
+        tags: |
+          Move-Hackathon-$(tag)
+          latest
